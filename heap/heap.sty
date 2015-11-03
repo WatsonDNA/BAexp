@@ -1,0 +1,66 @@
+% heap.sty
+
+\newcount\heap@last
+\newif\if@heap@change@
+
+\def\heap@insert#1{%
+  \advance\heap@last\@ne
+  \expandafter\def\csname heap@\the\heap@last\endcsname{#1}%
+  \begingroup
+  \@tempcnta\heap@last
+  \@tempcntb\@tempcnta
+  \divide\@tempcnta\tw@
+  \@whilenum\@tempcnta>\z@\relax
+    \do{%
+      \expandafter\ifnum\csname heap@\the\@tempcnta\endcsname>#1\relax
+        \edef\heap@tempa{\csname heap@\the\@tempcnta\endcsname}%
+        \expandafter\gdef\csname heap@\the\@tempcnta\endcsname{#1}%
+        \expandafter\xdef\csname heap@\the\@tempcntb\endcsname{\heap@tempa}%
+      \fi
+      \@tempcntb\@tempcnta
+      \divide\@tempcnta\tw@}%
+  \endgroup}
+
+\def\heap@delete@min{%
+  \expandafter\edef\csname heap@1\endcsname{\csname heap@\the\heap@last\endcsname}%
+  \edef\heap@tempa{\csname heap@\the\heap@last\endcsname}%
+  \advance\heap@last\m@ne
+  \begingroup
+  \@tempcntb\@ne
+  \@tempcnta\tw@
+  \@whilenum\@tempcnta<\heap@last\relax
+    \do{%
+      \expandafter\ifnum\expandafter\heap@tempa\expandafter>\csname heap@\the\@tempcnta\endcsname
+        \edef\heap@tempb{\csname heap@\the\@tempcnta\endcsname}%
+        \expandafter\xdef\csname heap@\the\@tempcnta\endcsname{\heap@tempa}%
+        \expandafter\xdef\csname heap@\the\@tempcntb\endcsname{\heap@tempb}%
+      \else
+        \advance\@tempcnta\@ne\expandafter
+        \ifnum\expandafter\heap@tempa\expandafter>\csname heap@\the\@tempcnta\endcsname\relax
+          \edef\heap@tempb{\csname heap@\the\@tempcnta\endcsname}%
+          \expandafter\xdef\csname heap@\the\@tempcnta\endcsname{\heap@tempa}%
+          \expandafter\xdef\csname heap@\the\@tempcntb\endcsname{\heap@tempb}%
+        \else
+          \advance\@tempcnta\m@ne
+        \fi
+      \fi
+      \@tempcntb\@tempcnta
+      \multiply\@tempcnta\tw@}%
+  \ifnum\@tempcnta=\heap@last\relax
+    \expandafter\ifnum\expandafter\heap@tempa\expandafter>\csname heap@\the\@tempcnta\endcsname
+      \edef\heap@tempb{\csname heap@\the\@tempcnta\endcsname}%
+      \expandafter\xdef\csname heap@\the\@tempcnta\endcsname{\heap@tempa}%
+      \expandafter\xdef\csname heap@\the\@tempcntb\endcsname{\heap@tempb}%
+    \fi
+  \fi
+  \endgroup}
+
+\def\ShowHeap{%
+  \begingroup
+  \@tempcnta\heap@last
+  \@tempcntb\@ne
+  \@whilenum\@tempcntb<\@tempcnta\relax
+    \do{\csname heap@\the\@tempcntb\endcsname,\space\advance\@tempcntb\@ne}%
+  \csname heap@\the\@tempcntb\endcsname
+  \endgroup}
+
